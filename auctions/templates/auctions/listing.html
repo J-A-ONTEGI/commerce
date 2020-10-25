@@ -1,0 +1,101 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+<div class="listing-article-container" style="width: 75%;margin:auto">
+    <article class="listing" style="display:block;margin-left:auto;margin-right:auto">
+        <div class="listing-title">
+            <h1>Listing: {{listing.name}}</h1>
+        </div>
+    {% if not is_owner and listing.is_active%}
+    <div class="watch-list-toggle">
+        {% if not is_watched %}
+            <a href="{% url 'auctions:add-to-watchlist' listing.id%}"><button class="add-to-watchlist">Add to Watchlist</button></a>
+        {% else %}
+            <a href="{% url 'auctions:remove-from-watchlist' listing.id %}"><button class="remove-from-watchlist">Remove from Watchlist</button></a>
+        {% endif %}
+    </div>
+        {% else %}
+
+    {% endif %}
+
+
+        <div class="image-container">
+            <img src="{{listing.img_url}}" alt="No Image Available" width="500" height="500">
+        </div>
+        <div class="bidding-price-tag">
+            <strong>starting Bid: {{listing.starting_bid}}</strong>
+        </div>
+        <div class="listing-description">
+            {{listing.description}}
+        </div>
+    {% if listing.is_active %}
+    <div class="listing-current-bid">
+        There are {{ bid_count }} bids.{% if is_current_bidder%}Your bid of {{ current_bid.price }} is the current bid.
+    {% elif not current_bid %}
+        <strong style="color: red; font-size: 25px" >New</strong>
+                {% else %}
+                The current Bid is{{ current_bid.price }}
+    {% endif %}
+    </div>
+    {% endif %}
+        {% if not is_owner %}
+            {% if  not is_current_bidder %}
+            <div class="form-container">
+            <form action="{% url 'auctions:bid' listing.id %}" method='post'>
+                {% csrf_token %}
+                <div class="form-fieldset">
+                    <input type="number" name="price" placeholder="Bid">
+                    <button class="bid-submit" type="submit">Place Bid</button>
+                </div>
+            </form>
+        </div>
+                {% elif not listing.is_active%}
+                <strong style="color: darkgreen; font-size: 50px">You have won this listing at only ${{ current_bid.price }}</strong>
+                {% endif %}
+    <div class="listings-details">
+        Listed By:{{ listing.owner.first_name }} {{ listing.owner.last_name }}<br>
+            {% elif listing.is_active %}
+            <div class="form-container">
+            <form action="{% url 'auctions:close'%}" method="post">
+                {% csrf_token %}
+                <input type="hidden" value="{{ current_bid.id }}" name="bid_id">
+                <input type="hidden" value="{{ listing.id }}" name="listing_id">
+                <button type="submit">End Bidding</button>
+            </form>
+            </div>
+        {% else %}
+            <div> <strong style="color: darkgreen; font-size: 50px">
+                This listing is inactive
+            </strong></div>
+        {% endif %}
+        category :
+        {% for category in categories %}
+            <a href="{% url 'auctions:category' category.id %}">{{ category.name }}</a>
+        {% endfor %}
+    </div>
+
+    </article>
+    <div class=" comment-container" style="padding-top: 20px">
+        <h1>COMMENTS</h1>
+        {% for comment in comments %}
+            <div class="comment-article" style="padding-top: 10px">
+                <div class="comment-info" style="display: block">
+                    <div class="poster-name" style="padding-top: 10px;font-family: 'Times New Roman';font-size:30px;width:50%">Posted by: {{ comment.poster.username }}</div>
+                    <div class="made_on" style="font-size: 20px;float: right;width: 50%" >{{ comment.made_on }}</div>
+                    <div class="comment-content" style="color: darkmagenta; float: inherit">
+                        {{ comment.content }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="new-comment-form">
+            <form action="{% url 'auctions:comment' listing.id%}" method="post">
+                {% csrf_token %}
+                <div class="form-field-set>">{{ form }}</div>
+                <div class="form-field-set"></div><button type="submit">Comment</button>
+            </form>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

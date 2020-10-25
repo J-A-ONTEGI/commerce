@@ -1,0 +1,16 @@
+{% extends 'auctions/layout.html' %}
+{% block body %}
+    {% for listing in listings %}
+        <a href="{% url 'auctions:listing' listing.id %}">
+            <article>
+                <div class="image-container">
+                    <img src="{{listing.img_url}}" alt="No Image Available" width="300" height="300">
+                </div>
+                <div class="listing-description">
+                    <strong>{{listing.name}}</strong>
+                </div>
+            </article>
+        </a>
+
+    {% endfor %}
+{% endblock %}

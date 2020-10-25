@@ -1,0 +1,13 @@
+{% extends 'auctions/layout.html' %}
+{% block body %}
+    <div class="categories-container" style="width: 75%;margin: auto;padding-top: 20px;align-content: center">
+        {% for category in categories %}
+            <div class="category-item" style="padding-right: 10px;float: left">
+            <a href="{% url 'auctions:category' category.id %}">
+                <button type="button">{{ category.name }}</button>
+            </a>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
